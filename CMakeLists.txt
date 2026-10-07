@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(GenerativeTopologyOptimizer VERSION 1.0 LANGUAGES CXX)
+project(GenerativeTopologyOptimizer VERSION 1.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -12,3 +12,12 @@ add_executable(topology_optimizer
     src/TopologyOptimizer.cpp
 )
 target_link_libraries(topology_optimizer PRIVATE Eigen3::Eigen)
+
+# Automated unit tests
+enable_testing()
+add_executable(test_optimizer
+    tests/test_optimizer.cpp
+    src/TopologyOptimizer.cpp
+)
+target_link_libraries(test_optimizer PRIVATE Eigen3::Eigen)
+add_test(NAME TestTopologyOptimizer COMMAND test_optimizer)

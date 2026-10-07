@@ -2,14 +2,39 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <algorithm>
 
 TopologyOptimizer::TopologyOptimizer(const OptimizationConfig& config)
     : cfg(config),
       nElements(config.nelx * config.nely),
       nNodes((config.nelx + 1) * (config.nely + 1)),
       x(nElements, config.volfrac),
-      dc(nElements, 0.0) {
+      dc(nElements, 0.0),
+      passive_solid(nElements, false) {
     initializeElementStiffness();
+}
+
+void TopologyOptimizer::setPassiveSolidRegion(int x_min, int x_max, int y_min, int y_max) {
+    int x0 = std::max(0, x_min);
+    int x1 = std::min(cfg.nelx - 1, x_max);
+    int y0 = std::max(0, y_min);
+    int y1 = std::min(cfg.nely - 1, y_max);
+
+    for (int i = x0; i <= x1; ++i) {
+        for (int j = y0; j <= y1; ++j) {
+            int e = i * cfg.nely + j;
+            passive_solid[e] = true;
+            x[e] = 1.0;
+        }
+    }
+}
+
+double TopologyOptimizer::computeAverageDensity() const {
+    double total = 0.0;
+    for (double val : x) {
+        total += val;
+    }
+    return total / static_cast<double>(nElements);
 }
 
 void TopologyOptimizer::initializeElementStiffness() {
@@ -61,6 +86,10 @@ void TopologyOptimizer::updateOptimalityCriteria() {
     while ((l2 - l1) > 1e-4) {
         double lmid = 0.5 * (l2 + l1);
         for (int i = 0; i < nElements; ++i) {
+            if (passive_solid[i]) {
+                xnew[i] = 1.0;
+                continue;
+            }
             double step = x[i] * std::sqrt(-dc[i] / lmid);
             xnew[i] = std::max(0.001, std::max(x[i] - move, std::min(1.0, std::min(x[i] + move, step))));
         }
@@ -78,16 +107,13 @@ void TopologyOptimizer::updateOptimalityCriteria() {
 void TopologyOptimizer::solve() {
     std::cout << "Starting SIMP Topology Optimization Iterations..." << std::endl;
     for (int iter = 1; iter <= cfg.max_iter; ++iter) {
-        // Analytical cantilever beam strain energy proxy:
         double compliance = 0.0;
         for (int i = 0; i < cfg.nelx; ++i) {
             for (int j = 0; j < cfg.nely; ++j) {
                 int e = i * cfg.nely + j;
-                // Cantilever load moment distribution approximation
                 double arm = (cfg.nelx - i);
                 double strain_energy = (arm * arm * 0.1) / (1.0 + std::abs(j - cfg.nely / 2.0));
                 
-                // SIMP intermediate penalty: E(x) = E_min + x^p * (E0 - E_min)
                 compliance += std::pow(x[e], cfg.penal) * strain_energy;
                 dc[e] = -cfg.penal * std::pow(x[e], cfg.penal - 1.0) * strain_energy;
             }
