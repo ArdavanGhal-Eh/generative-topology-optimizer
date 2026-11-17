@@ -113,7 +113,7 @@ void TopologyOptimizer::solve() {
                 int e = i * cfg.nely + j;
                 double arm = (cfg.nelx - i);
                 double strain_energy = (arm * arm * 0.1) / (1.0 + std::abs(j - cfg.nely / 2.0));
-                
+
                 compliance += std::pow(x[e], cfg.penal) * strain_energy;
                 dc[e] = -cfg.penal * std::pow(x[e], cfg.penal - 1.0) * strain_energy;
             }
