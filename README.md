@@ -288,8 +288,8 @@ Distributed under the **MIT License**. See `LICENSE` for details.
 
 ## 👤 Author & Contact
 
-**Ardavan Ghal-Eh**  
-*Department of Mechanical Engineering, Sharif University of Technology*  
+**Ardavan Ghal-Eh**
+*Department of Mechanical Engineering, Sharif University of Technology*
 - **GitHub:** [@ArdavanGhal-Eh](https://github.com/ArdavanGhal-Eh)
 - **Profile:** [github.com/ArdavanGhal-Eh](https://github.com/ArdavanGhal-Eh)
 
@@ -478,8 +478,8 @@ python export_stl.py --input topology_output.csv --thickness 15.0 --output brack
 
 ## 👤 پدیدآورنده
 
-**اردوان قلعه**  
-*دانشکده مهندسی مکانیک، دانشگاه صنعتی شریف*  
+**اردوان قلعه**
+*دانشکده مهندسی مکانیک، دانشگاه صنعتی شریف*
 - **گیت‌هاب:** [@ArdavanGhal-Eh](https://github.com/ArdavanGhal-Eh)
 
 <p align="right">(<a href="#readme-top">بازگشت به بالا ↑</a>)</p>
